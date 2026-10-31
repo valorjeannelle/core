@@ -1,0 +1,138 @@
+
+{
+  "function": "money.parse",
+  "status": "active",
+  "cases": [
+    {
+      "name": "simple integer",
+      "input": "125000",
+      "expected": 125000
+    },
+    {
+      "name": "zero",
+      "input": "0",
+      "expected": 0
+    },
+    {
+      "name": "negative amount",
+      "input": "-1500",
+      "expected": -1500
+    },
+    {
+      "name": "ordinary space separator",
+      "input": "125 000",
+      "expected": 125000
+    },
+    {
+      "name": "non-breaking space separator U+00A0",
+      "input": "125\u00A0000",
+      "expected": 125000
+    },
+    {
+      "name": "narrow non-breaking space separator U+202F",
+      "input": "125\u202F000",
+      "expected": 125000
+    },
+    {
+      "name": "dot as thousands separator",
+      "input": "1.500",
+      "expected": 1500
+    },
+    {
+      "name": "comma as thousands separator",
+      "input": "125,000",
+      "expected": 125000
+    },
+    {
+      "name": "leading and trailing spaces",
+      "input": " 125000 ",
+      "expected": 125000
+    },
+    {
+      "name": "label FCFA",
+      "input": "125000 FCFA",
+      "expected": 125000
+    },
+    {
+      "name": "label F CFA",
+      "input": "125.000 F CFA",
+      "expected": 125000
+    },
+    {
+      "name": "label CFA",
+      "input": "125000 CFA",
+      "expected": 125000
+    },
+    {
+      "name": "label F without separator",
+      "input": "125000F",
+      "expected": 125000
+    },
+    {
+      "name": "label XAF",
+      "input": "125000 XAF",
+      "expected": 125000
+    },
+    {
+      "name": "label francs",
+      "input": "125000 francs",
+      "expected": 125000
+    },
+    {
+      "name": "lowercase currency label",
+      "input": "125000 fcfa",
+      "expected": 125000
+    },
+    {
+      "name": "label directly attached",
+      "input": "125000FCFA",
+      "expected": 125000
+    },
+    {
+      "name": "decimal comma rejected",
+      "input": "12,50",
+      "expectedError": true
+    },
+    {
+      "name": "decimal dot rejected",
+      "input": "12.50",
+      "expectedError": true
+    },
+    {
+      "name": "abbreviated amount rejected",
+      "input": "125k",
+      "expectedError": true
+    },
+    {
+      "name": "incorrect space grouping",
+      "input": "1 25 000",
+      "expectedError": true
+    },
+    {
+      "name": "mixed dot and space separators rejected",
+      "input": "1.250 000",
+      "expectedError": true
+    },
+    {
+      "name": "mixed comma and dot separators rejected",
+      "input": "1,250.000",
+      "expectedError": true
+    },
+    {
+      "name": "invalid text",
+      "input": "abc",
+      "expectedError": true
+    },
+    {
+      "name": "empty string",
+      "input": "",
+      "expectedError": true
+    },
+    {
+      "name": "whitespace only",
+      "input": " ",
+      "expectedError": true
+    }
+  ]
+}
+
