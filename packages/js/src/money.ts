@@ -30,6 +30,72 @@ export function format(amount: number, options: FormatOptions = {}): string {
   return label ? `${sign}${grouped} ${label}` : `${sign}${grouped}`;
 }
 
+
+/**
+ * Parse a formatted CFA amount into an integer.
+ * Supports thousands separators: spaces, dots and commas.
+ * Supports currency labels: FCFA, F CFA, CFA, F, XAF and francs.
+ */
+export function parse(value: string): number {
+  if (typeof value !== 'string') {
+    throw new TypeError('money.parse expects a string');
+  }
+
+  const input = value.trim();
+
+  if (!input) {
+    throw new TypeError('money.parse expects a non-empty string');
+  }
+
+  // Remove an optional currency label only at the end.
+const currencyPattern = /(?:FCFA|F\s*CFA|CFA|XAF|francs?|F)$/i;
+
+const cleaned = input.replace(currencyPattern, '').trim();
+
+  // Extract the optional negative sign.
+  const sign = cleaned.startsWith('-') ? '-' : '';
+  const unsigned = cleaned.replace(/^-/, '');
+
+  if (!unsigned) {
+    throw new TypeError('money.parse received an invalid amount');
+  }
+
+  // Determine the thousands separator.
+  const separators = unsigned.match(/[.,\s\u00A0\u202F]/g) ?? [];
+  const uniqueSeparators = [...new Set(separators)];
+
+  if (uniqueSeparators.length > 1) {
+    throw new TypeError('money.parse received mixed separators');
+  }
+
+  const separator = uniqueSeparators[0];
+
+  let digits = unsigned;
+  if (separator) {
+  const escapedSeparator = separator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const groupingPattern = new RegExp(
+    `^\\d{1,3}(?:${escapedSeparator}\\d{3})+$`
+  );
+
+  if (!groupingPattern.test(unsigned)) {
+    throw new TypeError('money.parse received an invalid amount format');
+  }
+
+  digits = unsigned.replace(/[.,\s\u00A0\u202F]/g, '');
+  } else if (!/^\d+$/.test(unsigned)) {
+  throw new TypeError('money.parse received an invalid amount');
+ }
+  
+  const result = Number(`${sign}${digits}`);
+
+  if (!Number.isSafeInteger(result)) {
+    throw new RangeError('money.parse expects a safe integer amount');
+  }
+
+  return result;
+ }
+
 /**
  * Amount in words: toWords(125000) === 'cent vingt-cinq mille francs CFA'.
  * Specified by fixtures/money/to-words.json. Not implemented yet: see the open issue.
